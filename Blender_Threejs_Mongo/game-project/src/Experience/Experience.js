@@ -122,7 +122,11 @@ export default class Experience {
 
         // Reiniciar contadores y tracker para la nueva partida/visualización
         this.points = 0
-        if (this.world) this.world.points = 0
+        if (this.world) {
+          this.world.currentLevelPoints = 0
+          this.world.totalPoints = 0
+          this.world.levelPoints = {}
+        }
         try {
           this.tracker?.destroy()
         } catch (e) {
@@ -404,7 +408,9 @@ export default class Experience {
     }
 
     // Resetear variables de World
-    this.world.points = 0;
+    this.world.currentLevelPoints = 0;
+    this.world.totalPoints = 0;
+    this.world.levelPoints = {};
     this.world.robot.points = 0;
     this.world.loader.prizes = [];
     this.world.defeatTriggered = false

@@ -241,9 +241,9 @@
     },
     {
         "name": "coin_final_level1",
-        "x": -41.24926247413554,
-        "y": 1.2,
-        "z": 32,
+        "x": 5,
+        "y": 1.4,
+        "z": 8,
         "level": 1,
         "role": "finalPrize"
     },

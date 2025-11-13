@@ -24,6 +24,11 @@ export default class World {
         this.finalPrizeActivated = false
         this.levelProgressing = false  // Prevenir progresión múltiple
         this.gameStarted = false
+        
+        // Sistema de puntuación total
+        this.totalPoints = 0;  // Puntos acumulados de todos los niveles
+        this.levelPoints = {}; // Puntos por nivel individual
+        this.currentLevelPoints = 0; // Puntos del nivel actual
         this.enemies = []
 
         this.coinSound = new Sound('/sounds/coin.ogg')
@@ -210,18 +215,23 @@ export default class World {
                 prize.collected = true
 
                 if (prize.role === "default") {
-                    this.points = (this.points || 0) + 1
-                    this.robot.points = this.points
+                    this.currentLevelPoints = (this.currentLevelPoints || 0) + 1
+                    this.totalPoints = (this.totalPoints || 0) + 1
+                    this.robot.points = this.currentLevelPoints
 
                     const pointsTarget = this.levelManager.getCurrentLevelTargetPoints()
-                    console.log(`🎯 Monedas recolectadas: ${this.points} / ${pointsTarget} (Nivel ${this.levelManager.currentLevel})`)
+                    console.log(`🎯 Monedas recolectadas: ${this.currentLevelPoints} / ${pointsTarget} (Nivel ${this.levelManager.currentLevel})`);
+                    console.log(`💰 Puntos totales acumulados: ${this.totalPoints}`);
 
-                    if (!this.finalPrizeActivated && this.points === pointsTarget) {
+                    if (!this.finalPrizeActivated && this.currentLevelPoints === pointsTarget) {
+                        console.log(`🏆 ¡Activando moneda final del nivel ${this.levelManager.currentLevel}!`);
                         const finalCoin = this.loader.prizes.find(p => p.role === "finalPrize")
                         if (finalCoin && !finalCoin.collected && finalCoin.pivot) {
                             finalCoin.pivot.visible = true
                             if (finalCoin.model) finalCoin.model.visible = true
                             this.finalPrizeActivated = true
+                            
+                            console.log(`🔥 Moneda final visible en posición:`, finalCoin.pivot.position);
 
                             new FinalPrizeParticles({
                                 scene: this.scene,
@@ -278,6 +288,8 @@ export default class World {
                 }
 
                 if (prize.role === "finalPrize") {
+                    console.log(`🎆 ¡Moneda final del nivel ${this.levelManager.currentLevel} recogida!`);
+                    
                     // Prevenir progresión múltiple
                     if (this.levelProgressing) {
                         console.log('⚠️ Progresión ya en curso, ignorando...');
@@ -286,7 +298,10 @@ export default class World {
                     
                     this.levelProgressing = true;
                     console.log(`🎯 Nivel ${this.levelManager.currentLevel} completado. Avanzando al nivel ${this.levelManager.currentLevel + 1}...`);
-                    console.log(`📊 Estado actual: points=${this.points}, currentLevel=${this.levelManager.currentLevel}`);
+                    console.log(`📊 Estado actual: currentLevelPoints=${this.currentLevelPoints}, totalPoints=${this.totalPoints}, currentLevel=${this.levelManager.currentLevel}`);
+                    
+                    // Guardar puntos del nivel completado
+                    this.levelPoints[this.levelManager.currentLevel] = this.currentLevelPoints;
                     
                     // Avanzar al siguiente nivel automáticamente
                     if (this.levelManager.currentLevel < this.levelManager.totalLevels) {
@@ -299,10 +314,18 @@ export default class World {
                             }, 500);
                         }, 1000);
                     } else {
-                        // Último nivel completado - mostrar modal final
+                        // 🏆 ¡JUEGO COMPLETADO! - Mostrar modal con puntuación total final
                         const elapsed = this.experience.tracker.stop();
                         this.experience.tracker.saveTime(elapsed);
-                        this.experience.tracker.showEndGameModal(elapsed);
+                        
+                        // Calcular estadísticas finales
+                        const finalStats = {
+                            totalPoints: this.totalPoints,
+                            levelPoints: this.levelPoints,
+                            timeElapsed: elapsed
+                        };
+                        
+                        this.experience.tracker.showFinalGameModal(finalStats);
 
                         this.experience.obstacleWavesDisabled = true;
                         clearTimeout(this.experience.obstacleWaveTimeout);
@@ -323,7 +346,7 @@ export default class World {
                     this.coinSound.play()
                 }
 
-                this.experience.menu.setStatus?.(`🎖️ Puntos: ${this.points}`)
+                this.experience.menu.setStatus?.(`🎖️ Nivel ${this.levelManager.currentLevel}: ${this.currentLevelPoints} | Total: ${this.totalPoints}`)
             }
         })
 
@@ -431,11 +454,12 @@ export default class World {
 
     async loadLevel(level) {
         // Reset de variables importantes al cargar nuevo nivel
-        this.points = 0;
+        this.currentLevelPoints = 0; // Solo resetear puntos del nivel actual
         this.finalPrizeActivated = false;
         this.levelProgressing = false;
         console.log(`🔄 Cargando nivel ${level}. Variables reseteadas.`);
         console.log(`📍 Nivel solicitado: ${level}, currentLevel será actualizado después.`);
+        console.log(`💰 Puntos totales mantenidos: ${this.totalPoints}`);
         
         try {
             const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';

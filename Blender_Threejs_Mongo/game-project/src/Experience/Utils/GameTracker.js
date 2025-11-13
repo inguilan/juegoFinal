@@ -53,6 +53,46 @@ export default class GameTracker {
         return JSON.parse(localStorage.getItem('bestTimes') || '[]')
     }
 
+    //Modal de fin de juego con puntuación total
+    showFinalGameModal(finalStats) {
+        const best = this.getBestTimes()
+        const ranking = best.map((t, i) => `#${i + 1}: ${t}s`).join('\n')
+        
+        // Crear resumen detallado de puntos por nivel
+        let levelSummary = '';
+        for (let level in finalStats.levelPoints) {
+            levelSummary += `🎯 Nivel ${level}: ${finalStats.levelPoints[level]} monedas\n`;
+        }
+
+        if (!this.modal || typeof this.modal.show !== 'function') {
+            console.warn('⚠️ No se puede mostrar el modal de fin: modal no definido.')
+            return
+        }
+
+        this.modal.show({
+            icon: '🏆',
+            message: `🎉 ¡FELICIDADES! 🎉\n¡Has completado todos los niveles!\n\n📊 PUNTUACIÓN FINAL:\n${levelSummary}\n🎯 TOTAL: ${finalStats.totalPoints} monedas\n⏱️ Tiempo: ${finalStats.timeElapsed}s\n\n🏆 Mejores tiempos:\n${ranking}`,
+            buttons: [
+                {
+                    text: '🔁 Jugar de Nuevo',
+                    onClick: () => {
+                        window.experience.resetGameToFirstLevel();
+                    }
+                },
+                {
+                    text: '🎮 Menú Principal',
+                    onClick: () => {
+                        this.modal.hide()
+                        this.showReplayButton()
+                    }
+                }
+            ]
+        })
+
+        const cancelBtn = document.getElementById('cancel-button')
+        if (cancelBtn) cancelBtn.remove()
+    }
+
     //Modal de fin de juego
     showEndGameModal(currentTime) {
         const best = this.getBestTimes()
