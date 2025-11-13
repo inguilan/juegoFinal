@@ -115,13 +115,9 @@ export default class Experience {
       },
       onCancelGame: () => this.tracker.handleCancelGame(), // 🔴 aquí se integra la lógica central
       onLoadLevel: (level) => {
-        // Limpiar escena previa y actualizar el gestor de niveles antes de cargar
+        // Limpiar escena previa
         if (this.world && typeof this.world.clearCurrentScene === 'function') {
           this.world.clearCurrentScene()
-        }
-
-        if (this.levelManager) {
-          this.levelManager.currentLevel = level
         }
 
         // Reiniciar contadores y tracker para la nueva partida/visualización
@@ -137,11 +133,20 @@ export default class Experience {
         // Dejar un pequeño retardo para asegurar que la limpieza se aplique
         setTimeout(() => {
           if (this.world && typeof this.world.loadLevel === 'function') {
+            // Establecer currentLevel DESPUÉS de cargar, no antes
             this.world.loadLevel(level)
+            if (this.levelManager) {
+              this.levelManager.currentLevel = level
+            }
           } else {
             console.warn('Mundo no inicializado aún. Intentando cargar nivel después.')
             setTimeout(() => {
-              if (this.world && typeof this.world.loadLevel === 'function') this.world.loadLevel(level)
+              if (this.world && typeof this.world.loadLevel === 'function') {
+                this.world.loadLevel(level)
+                if (this.levelManager) {
+                  this.levelManager.currentLevel = level
+                }
+              }
             }, 300)
           }
         }, 80)

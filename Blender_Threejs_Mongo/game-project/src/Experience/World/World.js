@@ -22,6 +22,7 @@ export default class World {
         this.resources = this.experience.resources
         this.levelManager = new LevelManager(this.experience);
         this.finalPrizeActivated = false
+        this.levelProgressing = false  // Prevenir progresión múltiple
         this.gameStarted = false
         this.enemies = []
 
@@ -213,7 +214,7 @@ export default class World {
                     this.robot.points = this.points
 
                     const pointsTarget = this.levelManager.getCurrentLevelTargetPoints()
-                    console.log(`🎯 Monedas recolectadas: ${this.points} / ${pointsTarget}`)
+                    console.log(`🎯 Monedas recolectadas: ${this.points} / ${pointsTarget} (Nivel ${this.levelManager.currentLevel})`)
 
                     if (!this.finalPrizeActivated && this.points === pointsTarget) {
                         const finalCoin = this.loader.prizes.find(p => p.role === "finalPrize")
@@ -277,13 +278,25 @@ export default class World {
                 }
 
                 if (prize.role === "finalPrize") {
+                    // Prevenir progresión múltiple
+                    if (this.levelProgressing) {
+                        console.log('⚠️ Progresión ya en curso, ignorando...');
+                        return;
+                    }
+                    
+                    this.levelProgressing = true;
+                    console.log(`🎯 Nivel ${this.levelManager.currentLevel} completado. Avanzando al nivel ${this.levelManager.currentLevel + 1}...`);
+                    console.log(`📊 Estado actual: points=${this.points}, currentLevel=${this.levelManager.currentLevel}`);
+                    
                     // Avanzar al siguiente nivel automáticamente
                     if (this.levelManager.currentLevel < this.levelManager.totalLevels) {
-                        console.log(`🎯 Nivel ${this.levelManager.currentLevel} completado. Avanzando al nivel ${this.levelManager.currentLevel + 1}...`);
-                        
                         // Pequeño delay para mostrar efectos visuales antes de cambiar
                         setTimeout(() => {
                             this.levelManager.nextLevel();
+                            // Reset de progresión después del cambio
+                            setTimeout(() => {
+                                this.levelProgressing = false;
+                            }, 500);
                         }, 1000);
                     } else {
                         // Último nivel completado - mostrar modal final
@@ -417,6 +430,13 @@ export default class World {
 
 
     async loadLevel(level) {
+        // Reset de variables importantes al cargar nuevo nivel
+        this.points = 0;
+        this.finalPrizeActivated = false;
+        this.levelProgressing = false;
+        console.log(`🔄 Cargando nivel ${level}. Variables reseteadas.`);
+        console.log(`📍 Nivel solicitado: ${level}, currentLevel será actualizado después.`);
+        
         try {
             const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
             const apiUrl = `${backendUrl}/api/blocks?level=${level}`;
@@ -454,6 +474,8 @@ export default class World {
                 const allBlocks = await localRes.json();
 
                 const filteredBlocks = allBlocks.filter(b => b.level === level);
+                console.log(`📊 Bloques filtrados para nivel ${level}:`, filteredBlocks.length);
+                console.log(`🪙 Monedas en este nivel:`, filteredBlocks.filter(b => b.name.startsWith('coin')).map(b => `${b.name} (${b.role || 'default'})`));
 
                 data = {
                     blocks: filteredBlocks,
@@ -465,7 +487,7 @@ export default class World {
 
             // Configurar spawn points específicos por nivel
             if (level === 2) {
-                spawnPoint = { x: -17, y: 1.5, z: -67 }; // Nivel 2 - coordenadas por defecto
+                spawnPoint = { x: 3.907223611972176, y: 1, z: 4.767078502872419 }; // Nivel 2 - coordenadas especificadas
             } else if (level === 3) {
                 spawnPoint = { x: 2.818863188461002, y: 1, z: -4.571316480248022 }; // Nivel 3 - coordenadas especificadas
             }
@@ -577,6 +599,12 @@ export default class World {
         console.log(`✅ Objetos 3D eliminados: ${visualObjectsRemoved}`);
         console.log(`✅ Cuerpos físicos eliminados: ${physicsBodiesRemoved}`);
         console.log(`🎯 Objetos 3D actuales en escena: ${this.scene.children.length}`);
+
+        // 🔥 IMPORTANTE: Limpiar array de prizes para evitar conflictos entre niveles
+        if (this.loader && this.loader.prizes) {
+            console.log(`🪙 Limpiando ${this.loader.prizes.length} monedas del nivel anterior`);
+            this.loader.prizes = [];
+        }
 
         if (physicsBodiesRemaining !== -1) {
             console.log(`🎯 Cuerpos físicos actuales en Physics World: ${physicsBodiesRemaining}`);

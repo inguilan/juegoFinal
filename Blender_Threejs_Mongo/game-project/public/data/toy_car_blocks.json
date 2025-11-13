@@ -161,51 +161,43 @@
     },
     {
         "name": "coin_level2_1",
-        "x": -15,
-        "y": 1,
-        "z": -65,
+        "x": 8,
+        "y": 1.2,
+        "z": 2,
         "level": 2,
         "role": "default"
     },
     {
         "name": "coin_level2_2",
-        "x": -20,
-        "y": 1,
-        "z": -68,
+        "x": -2,
+        "y": 1.2,
+        "z": 8,
         "level": 2,
         "role": "default"
     },
     {
         "name": "coin_level2_3",
-        "x": -14,
-        "y": 1,
-        "z": -70,
+        "x": 12,
+        "y": 1.2,
+        "z": 7,
         "level": 2,
         "role": "default"
     },
     {
         "name": "coin_level2_4",
-        "x": -19,
-        "y": 1,
-        "z": -64,
+        "x": 6,
+        "y": 1.2,
+        "z": -3,
         "level": 2,
         "role": "default"
     },
     {
         "name": "coin_level2_5",
-        "x": -16,
-        "y": 1,
-        "z": -66,
+        "x": 1,
+        "y": 1.2,
+        "z": 12,
         "level": 2,
         "role": "default"
-    },
-    {
-        "name": "coin_final_level2",
-        "x": -17,
-        "y": 1.2,
-        "z": -67,
-        "level": 2,
-        "role": "finalPrize"
     },
     {
         "name": "baked_lev1",
@@ -544,33 +536,41 @@
         "role": "default"
     },
     {
+        "name": "coin_final_level2",
+        "x": 4,
+        "y": 1.4,
+        "z": 5,
+        "level": 2,
+        "role": "finalPrize"
+    },
+    {
         "name": "coin_level3_1",
-        "x": 3,
-        "y": 1,
-        "z": -4,
+        "x": -8,
+        "y": 1.2,
+        "z": -12,
         "level": 3,
         "role": "default"
     },
     {
         "name": "coin_level3_2",
-        "x": 5,
-        "y": 1,
-        "z": -6,
+        "x": 15,
+        "y": 1.2,
+        "z": -8,
         "level": 3,
         "role": "default"
     },
     {
         "name": "coin_level3_3",
-        "x": 0,
-        "y": 1,
-        "z": -3,
+        "x": 8,
+        "y": 1.2,
+        "z": 10,
         "level": 3,
         "role": "default"
     },
     {
         "name": "coin_final_level3",
-        "x": 2,
-        "y": 1.2,
+        "x": 5,
+        "y": 1.4,
         "z": -2,
         "level": 3,
         "role": "finalPrize"

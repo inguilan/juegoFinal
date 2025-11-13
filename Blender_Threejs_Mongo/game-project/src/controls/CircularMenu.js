@@ -52,9 +52,9 @@ export default class CircularMenu {
       { icon: '🥽', title: 'Modo VR', onClick: () => this.vrIntegration.toggleVR() },
       { icon: '👨‍💻', title: 'Acerca de', onClick: () => this.showAboutModal() },
       // Botón para cargar el Nivel 2. Llama al callback `onLoadLevel` si fue proporcionado.
-      { icon: '2️⃣', title: 'Nivel 2', onClick: () => onLoadLevel?.(2) },
+      { icon: '2️⃣', title: 'Nivel 2', onClick: () => { console.log('🎯 Botón Nivel 2 presionado'); onLoadLevel?.(2) } },
       // Botón para cargar el Nivel 3
-      { icon: '3️⃣', title: 'Nivel 3', onClick: () => onLoadLevel?.(3) },
+      { icon: '3️⃣', title: 'Nivel 3', onClick: () => { console.log('🎯 Botón Nivel 3 presionado'); onLoadLevel?.(3) } },
       { icon: '❌', title: 'Cancelar Juego', onClick: onCancelGame }
     ]
 

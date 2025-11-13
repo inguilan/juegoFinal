@@ -22,7 +22,7 @@ export default class LevelManager {
             setTimeout(() => {
                 // Coordenadas específicas para cada nivel
                 const spawnPoints = {
-                    2: { x: -15, y: 1.5, z: -63 }, // Nivel 2 - cerca de las monedas
+                    2: { x: 3.907223611972176, y: 1, z: 4.767078502872419 }, // Nivel 2 - coordenadas especificadas por el usuario
                     3: { x: 1, y: 1.5, z: -1 }     // Nivel 3 - coordenadas ya configuradas
                 };
                 

@@ -211,7 +211,7 @@ export default class ToyCarLoader {
                 }
 
                 this.prizes.push(prize);
-                console.log(`🪙 Moneda creada: ${block.name} en (${block.x}, ${block.y}, ${block.z})`);
+                console.log(`🪙 Moneda creada: ${block.name} en (${block.x}, ${block.y}, ${block.z}) - Nivel: ${block.level} - Role: ${block.role || "default"}`);
                 return;
             }
 
